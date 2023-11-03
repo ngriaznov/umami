@@ -116,6 +116,21 @@ async function parseFilters(websiteId: string, filters: QueryFilters = {}, optio
   };
 }
 
+async function parseTeamFilters(
+  teamId: string,
+  filters: QueryFilters = {},
+  options?: QueryOptions,
+) {
+  return {
+    filterQuery: getFilterQuery(filters, options),
+    params: {
+      ...normalizeFilters(filters),
+      teamId,
+      startDate: filters.startDate,
+    },
+  };
+}
+
 async function rawQuery(query: string, params: Record<string, unknown> = {}): Promise<unknown> {
   if (process.env.LOG_QUERY) {
     log('QUERY:\n', query);
@@ -168,4 +183,5 @@ export default {
   findUnique,
   findFirst,
   rawQuery,
+  parseTeamFilters,
 };

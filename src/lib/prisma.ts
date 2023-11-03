@@ -153,6 +153,21 @@ async function parseFilters(websiteId, filters: QueryFilters = {}, options: Quer
   };
 }
 
+async function parseTeamFilters(teamId, filters: QueryFilters = {}, options: QueryOptions = {}) {
+  return {
+    joinSession:
+      options?.joinSession || Object.keys(filters).find(key => SESSION_COLUMNS.includes(key))
+        ? `inner join session on website_event.session_id = session.session_id`
+        : '',
+    filterQuery: getFilterQuery(filters, options),
+    params: {
+      ...normalizeFilters(filters),
+      teamId,
+      startDate: filters.startDate,
+    },
+  };
+}
+
 async function rawQuery(sql: string, data: object): Promise<any> {
   const db = getDatabaseType();
   const params = [];
@@ -226,4 +241,5 @@ export default {
   getPageFilters,
   getSearchMode,
   rawQuery,
+  parseTeamFilters,
 };
