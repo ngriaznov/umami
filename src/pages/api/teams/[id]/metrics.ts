@@ -1,7 +1,7 @@
 import { NextApiResponse } from 'next';
 import { badRequest, methodNotAllowed, ok, unauthorized } from 'next-basics';
 import { WebsiteMetric, NextApiRequestQueryBody } from 'lib/types';
-import { canViewWebsite } from 'lib/auth';
+import { canViewTeam } from 'lib/auth';
 import { useAuth, useCors, useValidate } from 'lib/middleware';
 import { SESSION_COLUMNS, EVENT_COLUMNS, FILTER_COLUMNS } from 'lib/constants';
 import { getTeamPageviewMetrics, getTeamSessionMetrics } from 'queries';
@@ -57,7 +57,7 @@ export default async (
   await useValidate(schema, req, res);
 
   const {
-    id: websiteId,
+    id: teamId,
     type,
     url,
     referrer,
@@ -74,7 +74,7 @@ export default async (
   } = req.query;
 
   if (req.method === 'GET') {
-    if (!(await canViewWebsite(req.auth, websiteId))) {
+    if (!(await canViewTeam(req.auth, teamId))) {
       return unauthorized(res);
     }
 
@@ -100,7 +100,7 @@ export default async (
     const column = FILTER_COLUMNS[type] || type;
 
     if (SESSION_COLUMNS.includes(type)) {
-      const data = await getTeamSessionMetrics(websiteId, column, filters);
+      const data = await getTeamSessionMetrics(teamId, column, filters);
 
       if (type === 'language') {
         const combined = {};
@@ -122,7 +122,7 @@ export default async (
     }
 
     if (EVENT_COLUMNS.includes(type)) {
-      const data = await getTeamPageviewMetrics(websiteId, column, filters);
+      const data = await getTeamPageviewMetrics(teamId, column, filters);
 
       return ok(res, data);
     }

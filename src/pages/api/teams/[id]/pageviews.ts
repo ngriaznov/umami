@@ -53,7 +53,7 @@ export default async (
   await useValidate(schema, req, res);
 
   const {
-    id: websiteId,
+    id: teamId,
     timezone,
     url,
     referrer,
@@ -67,7 +67,7 @@ export default async (
   } = req.query;
 
   if (req.method === 'GET') {
-    if (!(await canViewTeam(req.auth, websiteId))) {
+    if (!(await canViewTeam(req.auth, teamId))) {
       return unauthorized(res);
     }
 
@@ -90,8 +90,8 @@ export default async (
     };
 
     const [pageviews, sessions] = await Promise.all([
-      getTeamPageviewStats(websiteId, filters),
-      getTeamSessionStats(websiteId, filters),
+      getTeamPageviewStats(teamId, filters),
+      getTeamSessionStats(teamId, filters),
     ]);
 
     return ok(res, { pageviews, sessions });
